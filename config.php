@@ -8,9 +8,6 @@
   'routes' => [
     '/' => 'views/index/index.php',
     '/artists' => 'views/artists/index.php',
-    '/artists/:id' => 'views/artists/show.php',
-    '/test' => [ 'controllers/test_controller.php', 'index' ],
-    '/test/:id' => [ 'controllers/test_controller.php', 'show' ],
-    '/test/:id/edit' => [ 'controllers/test_controller.php', 'edit' ]
+    '/artists/:id' => 'views/artists/show.php'
   ]
 ];

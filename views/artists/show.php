@@ -3,6 +3,6 @@
   $stmt->execute([
     $params['id']
   ]);
-  $row = $stmt->fetch(PDO::FETCH_ASSOC);
+  $row = $stmt->fetch();
 ?>
 <h1><?= $row['name']; ?></h1>

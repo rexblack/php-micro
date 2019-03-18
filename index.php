@@ -2,13 +2,6 @@
 
 error_reporting(E_ALL);
 
-
-trait DB {
-  public function __get($property) {
-    return 'A';
-  }
-}
-
 return (new class {
   public $config = [];
   public $db = null;
@@ -64,7 +57,7 @@ return (new class {
         return [ $route, $params ];
       }
     }
-
+  
     return null;
   }
 
@@ -76,51 +69,9 @@ return (new class {
     if ($match) {
       list($route, $params) = $match;
       $this->params = $params;
-
-      list($controller_name, $action_name) = $route;
-
-      echo $controller_name;
-
-      if ($controller_name) {
-        // print_r(get_object_vars($this));
-        // $result = $this->render($controller_name, get_object_vars($this));
-        $controller_class = require($controller_name);
-
-        $controller = new $controller_class();
-
-        $reflectionClass = new ReflectionClass($controller_class);
-
-        $reflectionProperty = $reflectionClass->getProperty('db');
-
-        $reflectionProperty->setAccessible(true);
-        $reflectionProperty->setValue($controller, $this->db);
-
-        //$classname = get_class($controller_class);
-
-        $controller->{$action_name}();
-
-        exit;
-
-        echo "<br/>";
-        echo "GET NAME";
-        echo $classname;
-        echo "<br/>";
-        echo "EXIT";
-        exit;
-
-        $master = $this;
-
-        $controller = new $controller_class();
-
-        if (is_object($controller)) {
-          echo "IS OBJECT: " . $action_name;
-          $controller->{$action_name}();
-        } else {
-          echo $output;
-        }
-
-        exit;
-      }
+      echo $this->render($route, get_object_vars($this));
+    } else {
+      echo "FILE NOT FOUND";
     }
   }
 })->bootstrap();
