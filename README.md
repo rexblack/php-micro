@@ -7,7 +7,7 @@ Minimalistic MVC-Framework
 
 ### Configuration
 
-Copy `index.php` into your project directory and place a file named `config.php` next to it.
+Copy `index.php` and `.htaccess` into your project directory and place a file named `config.php` next to it.
 
 Specify your database connection and routes as follows:
 
