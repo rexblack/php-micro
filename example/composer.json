@@ -1,0 +1,21 @@
+{
+  "name": "benignware/php-micro-test",
+  "version": "1.0.0",
+  "description": "Test config for php-micro",
+  "homepage": "http://github.com/benignware/php-micro",
+  "authors": [
+    {
+      "name": "Rafael Nowrotek",
+      "email": "mail@benignware.com",
+      "homepage": "https://github.com/benignware"
+    }
+  ],
+  "repositories": [{
+    "type": "path",
+    "url": "/usr/local/lib/php-micro"
+  }],
+  "require": {
+    "php": ">=7.4",
+    "benignware/micro": "*"
+  }
+}
