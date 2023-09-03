@@ -18,9 +18,13 @@ namespace benignware\micro\middleware {
         : null;
 
       if (!$this->current_user) {
-        $match = array_values(array_filter($config['restricted'], function($path) use ($request) {
+        $matches = array_values(
+          array_filter(
+            $config['restricted'], function($path) use ($request) {
           return fnmatch($path, $request->path);
-        }))[0];
+          })
+        );
+        $match = count($matches) > 0 ? $matches[0] : null;
     
         if ($match) {
           $redirect_param = $config['redirect_param'];

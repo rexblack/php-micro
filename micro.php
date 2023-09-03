@@ -163,12 +163,15 @@ namespace benignware\micro {
         $response = new \stdClass();
         $response->status = 200;
         $response->body = '';
+        $response->headers = [
+          'Content-Type' => 'text/html'
+        ];
 
         $this->request = $request;
         $this->response = $response;
     
         foreach ($this->_middleware as $fn) {
-          $fn($request);
+          $fn($request, $response);
         }
     
         $result = '';
@@ -188,6 +191,12 @@ namespace benignware\micro {
           $response->status = $result;
         } else if (is_string($result)) {
           $response->body = $result;
+        } else if (is_object($result)) {
+          $response = (object) array_merge((array) $response, (array) $result);
+        }
+
+        foreach ($response->headers as $key => $value) {
+          header("$key: $value");
         }
 
         echo $response->body;
