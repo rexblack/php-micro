@@ -152,13 +152,9 @@ namespace benignware\micro {
           'path' => rtrim(strtok($_SERVER['REQUEST_URI'], '?'), '/') ?: '/',
           'method' => $_SERVER['REQUEST_METHOD'],
           'query' => $_SERVER['QUERY_STRING'],
-          'params' => (object) array_merge($_GET, $_POST)
+          'params' => (object) array_merge($_GET, $_POST),
+          'headers' => getallheaders()
         ];
-
-        $request = (object) array_merge(
-          get_object_vars($request),
-          get_object_vars($this->match($request) ?: new \stdClass())
-        );
 
         $response = new \stdClass();
         $response->status = 200;
@@ -169,15 +165,32 @@ namespace benignware\micro {
 
         $this->request = $request;
         $this->response = $response;
+
+        $match = $this->match($request);
+
+        $request = (object) array_merge(
+          get_object_vars($request),
+          $match ? get_object_vars($match ?: new \stdClass()) : []
+        );
+
+        $body = file_get_contents('php://input');
+
+        if ($body) {
+          if (isset($request->headers['Content-Type']) && $request->headers['Content-Type'] === 'application/json') {
+            $body = json_decode($body);
+          }
+
+          $request->body = $body;
+        }
     
         foreach ($this->_middleware as $fn) {
           $fn($request, $response);
         }
     
-        $result = '';
+        $result = null;
 
-        if ($request) {
-          if ($request->action) {
+        if ($match && $request) {
+          if (property_exists($request, 'action')) {
             if (is_callable($request->action)) {
               $action = $request->action->bindTo($this);
               $result = $action($request, $response);
@@ -185,6 +198,16 @@ namespace benignware\micro {
               $result = $this->render($request->action);
             }
           }
+        }
+
+        if ($result === null) {
+          $response->status = 404;
+        }
+
+        if ($response->status !== 200) {
+          $result = $this->render("./views/{$response->status}.php", [
+            'response' => $response
+          ]);
         }
 
         if (is_numeric($result)) {
