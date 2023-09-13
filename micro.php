@@ -49,7 +49,7 @@ namespace benignware\micro {
         foreach($options as $key => $value) {
           $$key = $options[$key];
         }
-    
+
         if (file_exists($template)) {
           ob_start();
           $result = require($template);
@@ -131,7 +131,7 @@ namespace benignware\micro {
             $names = $names[1];
             $values = array_merge($values, array_fill(count($values), count($names) - count($values), ''));
             $params = array_combine($names, $values);
-            $params = array_merge(get_object_vars($request->params), $params);
+            $params = array_merge($request->params, $params);
     
             return (object) array_merge(
               get_object_vars($request),
@@ -152,7 +152,7 @@ namespace benignware\micro {
           'path' => rtrim(strtok($_SERVER['REQUEST_URI'], '?'), '/') ?: '/',
           'method' => $_SERVER['REQUEST_METHOD'],
           'query' => $_SERVER['QUERY_STRING'],
-          'params' => (object) array_merge($_GET, $_POST),
+          'params' => array_merge($_GET, $_POST),
           'headers' => getallheaders()
         ];
 
