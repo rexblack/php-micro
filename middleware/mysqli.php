@@ -7,7 +7,8 @@ namespace benignware\micro\middleware {
       'db_user' => 'root',
       'db_password' => '',
       'db_name' => '',
-      'schema' => ''
+      'schema' => '',
+      'seed' => function() {}
     ], $config);
 
     return function () use ($config) {
@@ -29,6 +30,12 @@ namespace benignware\micro\middleware {
             $result->free();
           }
         } while ($this->db->next_result());
+      }
+
+      if (is_callable($config['seed'])) {
+        $seed = $config['seed'];
+        $fn = $seed->bindTo($this);
+        $fn($config);
       }
     };
   }

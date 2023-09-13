@@ -18,12 +18,9 @@ namespace benignware\micro\middleware {
         : null;
 
       if (!$this->current_user) {
-        $matches = array_values(
-          array_filter(
-            $config['restricted'], function($path) use ($request) {
+        $matches = array_values(array_filter($config['restricted'], function($path) use ($request) {
           return fnmatch($path, $request->path);
-          })
-        );
+        }));
         $match = count($matches) > 0 ? $matches[0] : null;
     
         if ($match) {
