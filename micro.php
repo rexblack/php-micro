@@ -86,7 +86,7 @@ namespace benignware\micro {
           case 'base_url':
             return $this->_base_url;
           default:
-            user_error("Invalid property: " . __CLASS__ . "->$name");
+            user_error("Invalid property: $name");
         }
       }
     
@@ -204,8 +204,14 @@ namespace benignware\micro {
           $response->status = 404;
         }
 
-        if ($response->status !== 200) {
-          $result = $this->render("./views/{$response->status}.php", [
+        if ($response->status !== 200 && $response->status !== 422) {
+          $error_view = "./views/{$response->status}.php";
+          
+          if (!file_exists($error_view)) {
+            $error_view = './views/error.php';
+          }
+
+          $result = $this->render($error_view, [
             'response' => $response
           ]);
         }
