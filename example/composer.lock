@@ -8,11 +8,11 @@
     "packages": [
         {
             "name": "benignware/micro",
-            "version": "0.0.1",
+            "version": "0.0.2",
             "dist": {
                 "type": "path",
                 "url": "/usr/local/lib/php-micro",
-                "reference": "229bae2c1c4a0a58d1ff6b35c81825f446750ac9"
+                "reference": "a1a3af51843d91a87d31119681658c93476a5769"
             },
             "require": {
                 "php": ">=7.4"
@@ -42,5 +42,5 @@
         "php": ">=7.4"
     },
     "platform-dev": [],
-    "plugin-api-version": "2.1.0"
+    "plugin-api-version": "2.3.0"
 }
