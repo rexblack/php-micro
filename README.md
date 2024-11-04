@@ -142,3 +142,12 @@ docker compose up -d
 ```
 
 Application should now be running at http://localhost:3000
+
+
+## Development
+
+Run the tests
+
+```shell
+./vendor/bin/phpunit tests/
+```

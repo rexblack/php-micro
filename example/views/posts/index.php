@@ -1,27 +1,47 @@
-<h1>Posts</h1>
+<div class="container mt-5">
+    <h1 class="mb-4">Posts</h1>
 
-<table class="table">
-  <thead>
-    <tr>
-      <th>Id</th>
-      <th>Title</th>
-      <th>Content</th>
-      <th></th>
-    </tr>
-  </thead>
-  <?php foreach ($posts as $post): ?>
-    <tr>
-      <td><?= $post['id']; ?></td>
-      <td><?= $post['title']; ?></td>
-      <td width="100%"><?= $post['content']; ?></td>
-      <td>
-        <div class="btn-group" role="group" aria-label="Basic example">
-          <a class="btn btn-sm btn-outline-secondary" href="<?= $this->url("/posts/{$post['id']}/show"); ?>"><i class="fas fa-eye"></i></a>
-          <a class="btn btn-sm btn-outline-secondary" href="<?= $this->url("/posts/{$post['id']}/edit"); ?>"><i class="fas fa-edit"></i></a>
-        </div>
-      </td>
-    </tr>
-  <?php endforeach; ?>
-</table>
+    <!-- Create Post link -->
+    <div class="mb-4">
+        <a href="<?= $this->url('/posts/create') ?>" class="btn btn-secondary">
+            <i class="fas fa-plus"></i> Create Post
+        </a>
+    </div>
 
-<a class="btn btn-primary" href="<?= $this->url('/posts/new'); ?>"><i class="fas fa-plus-circle"></i>&nbsp;<span>Add post</span></a>
+    <div class="row">
+        <?php foreach ($posts as $post): ?>
+            <div class="col-md-6 mb-4">
+                <div class="card shadow-sm">
+                    <div class="card-body">
+                        <h5 class="card-title"><?= htmlspecialchars($post->title) ?></h5>
+                        <p class="card-text"><?= htmlspecialchars($post->content) ?></p>
+                        <div class="d-flex justify-content-between mt-4">
+                            <a href="<?= $this->url('/posts/' . $post->id) ?>" class="btn btn-secondary btn-sm">
+                                <i class="fas fa-eye"></i> View
+                            </a>
+                            <a href="<?= $this->url('/posts/' . $post->id . '/edit') ?>" class="btn btn-secondary btn-sm">
+                                <i class="fas fa-edit"></i> Edit
+                            </a>
+                            <form action="<?= $this->url('/posts/' . $post->id) ?>" method="POST" class="d-inline">
+                                <input type="hidden" name="_method" value="DELETE">
+                                <button type="submit" class="btn btn-secondary btn-sm" onclick="return confirm('Are you sure you want to delete this post?');">
+                                    <i class="fas fa-trash"></i> Delete
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                    <div class="card-footer text-muted">
+                        <small>Posted on <?= date('F j, Y', strtotime($post->created_at ?? 'now')) ?></small>
+                    </div>
+                </div>
+            </div>
+        <?php endforeach; ?>
+    </div>
+    
+    <!-- Call the paginate helper directly in the view with custom options -->
+    <?= $this->paginate($totalPosts, $currentPage, [
+        'paginationClass' => 'pagination', // Custom class for the pagination container
+        'pageItemClass' => 'page-item',     // Custom class for each page item
+        'pageLinkClass' => 'page-link',     // Custom class for each page link
+    ]) ?>
+</div>

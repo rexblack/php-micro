@@ -1,119 +1,75 @@
 <?php
 
-require_once __DIR__ . '/vendor/autoload.php';
+require 'vendor/autoload.php';
 
-use function benignware\micro\app;
-use function benignware\micro\middleware\mysqli;
-use function benignware\micro\middleware\auth;
+use benignware\micro\Micro;
+use benignware\micro\middleware\Database;
+use benignware\micro\middleware\Authentication;
+use benignware\micro\middleware\Pagination;
+use benignware\micro\middleware\Json;
+use benignware\micro\app\controllers\UserController;
+use benignware\micro\app\controllers\PostController;
+use benignware\micro\app\controllers\AuthController;
 
-session_start();
+// Initialize the app instance
+$app = Micro::getInstance();
 
-$app = app();
+// Set the views and layout directory
+$app->set('views', 'views');
+$app->set('layout', 'layouts/main');
 
-$app->use(mysqli([
-  'db_host' => 'db',
-  'db_user' => 'user',
-  'db_password' => 'secret',
-  'db_name' => 'database',
-  'schema' => 'schema.sql'
+$app->use(Json::middleware());
+
+
+// Register database middleware
+$app->use(Database::middleware([
+    'db_host' => 'db',
+    'db_user' => 'user',
+    'db_password' => 'secret',
+    'db_name' => 'database',
 ]));
 
-$app->use(auth());
+// Register authentication middleware
+$app->use(Authentication::middleware([
+    'allowedPaths' => ['/login', '/register'],
+    'restrictedPaths' => ['*/edit'], // Update paths as needed
+    'redirectPath' => '/login',
+    'redirectParam' => 'redirect', // Customizable redirect parameter
+]));
 
-$app->set('layout', './views/layouts/app.php');
+// Register pagination middleware
+$app->use(Pagination::middleware([
+    'itemsPerPage' => 2 // Set the desired items per page
+]));
 
-$app->get('/', './views/index.php');
-
-$app->get('/about', './views/about.php');
-
-$app->get('/login', './views/account/sign-in.php');
-
-$app->get('/logout', function($params) {
-  unset($_SESSION['user']);
-
-  return $this->redirect('/');
+$app->get('/', function ($req, $res) {
+    $res->render('index');
 });
 
-$app->post('/login', function($request) {
-  [
-    'email' => $email,
-    'password' => $password,
-    'redirect' => $redirect
-  ] = $request->params;
+// Define routes for authentication
+$app->get('/register', [AuthController::class, 'register']);
+$app->post('/register', [AuthController::class, 'register']);
+$app->get('/login', [AuthController::class, 'login']);
+$app->post('/login', [AuthController::class, 'login']);
+$app->get('/logout', [AuthController::class, 'logout']);
 
-  if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
-    echo 'Please enter a valid email';
-    $error = true;
-    exit;
-  }
 
-  $result = $this->db->query("SELECT * FROM users WHERE email = '$email'");
-  $user = $result->fetch_assoc();
+// Define routes for user actions
+$app->get('/users', [UserController::class, 'index']);
+$app->get('/users/:id', [UserController::class, 'show']);
+$app->get('/users/:id/edit', [UserController::class, 'edit']);
+$app->post('/users/:id', [UserController::class, 'update']);
+$app->delete('/users/:id', [UserController::class, 'destroy']);
 
-  if ($user) {
-    $hashed_password = $user['password'];
 
-    if (password_verify($password, $hashed_password)) {
-      $_SESSION['user'] = $user;
-      return $this->redirect($redirect ?: '/');
-    }
-  }
+// Define routes for post actions
+$app->get('/posts', [PostController::class, 'index']);
+$app->get('/posts/create', [PostController::class, 'create']);
+$app->post('/posts', [PostController::class, 'store']);
+$app->get('/posts/:id', [PostController::class, 'show']);
+$app->get('/posts/:id/edit', [PostController::class, 'edit']);
+$app->post('/posts/:id', [PostController::class, 'update']);
+$app->delete('/posts/:id', [PostController::class, 'destroy']);
 
-  $this->redirect('/login');
-});
-
-$app->get('/posts', function() {
-  return $this->render('./views/posts/index.php', [
-    'posts' => $this->db->query("SELECT * FROM posts")
-  ]);
-});
-
-$app->get('/posts/new', './views/posts/new.php');
-
-$app->get('/posts/:id/edit', function($request) {
-  $stmt = $this->db->prepare("SELECT * FROM `posts` WHERE `id` = ?");
-  $stmt->bind_param('i', $request->params['id']);
-  $stmt->execute();
-
-  $post = $stmt->get_result()->fetch_assoc();
-
-  return $this->render('./views/posts/edit.php', [
-    'post' => $post
-  ]);
-});
-
-$app->post('/posts', function($request) {
-  ['title' => $title, 'content' => $content] = $request->params;
-
-  $stmt = $this->db->prepare("INSERT INTO `posts` (`title`, `content`) VALUES (?, ?);");
-  $stmt->bind_param('ss', $title, $content);
-  $stmt->execute();
-  $stmt->close();
-
-  $this->redirect("/posts/{$this->db->insert_id}/show");
-});
-
-$app->post('/posts/:id', function($request) {
-  ['id' => $id, 'title' => $title, 'content' => $content] = $request->params;
-
-  $stmt = $this->db->prepare("UPDATE `posts` SET `title` = ?, `content` = ? WHERE `id` = ?");
-  $stmt->bind_param('ssi', $title, $content, $id);
-  $stmt->execute();
-  $stmt->close();
-
-  $this->redirect("/posts/{$id}/show");
-});
-
-$app->get('/posts/:id/show', function($request) {
-  $stmt = $this->db->prepare("SELECT * FROM `posts` WHERE `id` = ?");
-  $stmt->bind_param('i', $request->params['id']);
-  $stmt->execute();
-
-  $post = $stmt->get_result()->fetch_assoc();
-
-  return $this->render('./views/posts/show.php', [
-    'post' => $post
-  ]);
-});
-
+// Bootstrap the app to start handling requests
 $app->bootstrap();

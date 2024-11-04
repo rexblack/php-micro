@@ -1,17 +1,12 @@
-<form
-  class="form-post"
-  action="<?= $this->url("/posts" . (isset($post['id']) ? "/{$post['id']}" : '')); ?>"
-  method="POST"
->
-  <div class="form-group">
-    <label>Title</label>
-    <input class="form-control" name="title" value="<?= $post['title']; ?>"/>
-  </div>
-  <div class="form-group">
-    <label>Content</label>
-    <input class="form-control" name="content" value="<?= $post['content']; ?>"/>
-  </div>
-  <div class="mt-2 mt-lg-4">
-    <button class="btn btn-primary" type="submit">Save Post</button>
-  </div>
+<form action="/posts<?= isset($post) ? '/' . $post->id : '' ?>" method="POST">
+    <div class="mb-3">
+        <label for="title" class="form-label">Title</label>
+        <input type="text" class="form-control" id="title" name="title" value="<?= htmlspecialchars($post->title ?? '') ?>" required>
+    </div>
+    <div class="mb-3">
+        <label for="content" class="form-label">Content</label>
+        <textarea class="form-control" id="content" name="content" rows="5" required><?= htmlspecialchars($post->content ?? '') ?></textarea>
+    </div>
+    <button type="submit" class="btn btn-success"><?= isset($post) ? 'Update' : 'Create' ?></button>
+    <a href="/posts" class="btn btn-secondary ms-2">Cancel</a> <!-- Cancel button to return to the posts list -->
 </form>

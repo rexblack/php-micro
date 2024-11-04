@@ -1,1 +1,1 @@
-<h1>File Not Found</h1>
+<h1>404</h1>

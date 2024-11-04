@@ -14,8 +14,15 @@
     "type": "path",
     "url": "/usr/local/lib/php-micro"
   }],
+  "minimum-stability": "beta",
+  "prefer-stable": true,
   "require": {
     "php": ">=7.4",
-    "benignware/micro": "*"
+    "benignware/micro": "0.1.0-beta.1"
+  },
+  "autoload": {
+    "psr-4": {
+      "benignware\\micro\\app\\": "./"
+    }
   }
 }

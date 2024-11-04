@@ -1,2 +1,2 @@
 <h1>Edit Post</h1>
-<?php include '_form.php'; ?>
+<?php include __DIR__ . '/_form.php'; ?>

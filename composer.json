@@ -1,14 +1,24 @@
 {
   "name": "benignware/micro",
-  "version": "0.0.2",
+  "version": "0.1.0-beta.1",
   "description": "Minimalist web framework",
   "license": "MIT",
   "require": {
     "php": ">=7.4"
   },
+  "require-dev": {
+    "phpunit/phpunit": "^9.5"
+  },
+  "scripts": {
+    "test": "docker compose run web ./vendor/bin/phpunit"
+  },
   "autoload": {
     "files": [
-      "index.php"
-    ]
+      "lib/index.php"
+    ],
+    "psr-4": {
+      "benignware\\micro\\": "lib/",
+      "benignware\\micro\\app\\": "app/"
+    }
   }
 }
